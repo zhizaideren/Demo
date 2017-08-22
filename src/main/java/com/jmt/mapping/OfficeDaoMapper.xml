@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.OfficeDao"><!-- 对应着Daoceng的接口 -->
+	<resultMap type="com.jmt.pojo.Office" id="OfficeAreaResultMap">
+		<id column="id" property="id" />
+		<result column="parent_id" property="parentId" />
+		<result column="parent_ids" property="parentIds" />
+		<result column="name" property="name" />
+		<result column="sort" property="sort" />
+		<result column="type" property="type" />
+		<result column="grade" property="grade" />
+		<result column="address" property="address" />
+		<result column="zipCode" property="zipCode" />
+		<result column="master" property="master" />
+
+		<result column="phone" property="phone" />
+		<result column="fax" property="fax" />
+		<result column="email" property="email" />
+		<result column="useable" property="useable" />
+		<result column="primary_person" property="primaryPerson" />
+		<result column="deputy_person" property="deputyPerson" />
+		<!-- <result column="create_by" property="createBy" /> -->
+		<result column="create_date" property="createDate" />
+		<!-- <result column="update_by" property="updateBy" /> -->
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<!-- 父类实体 -->
+		<!-- <association property="parent" resultMap="OfficeAreaResultMap"> -->
+		
+	<!-- 	</association> -->
+		<!-- 单个area实体 -->
+		<!-- <association property="area" resultMap="com.jmt.dao.AreaDao.AreaResultMap"></association> -->
+		<!-- area集合 -->
+		<!-- <collection property="arealist" ofType="com.jmt.pojo.Area"> <id column="id" 
+			property="id" /> <result column="parent_id" property="parentId" /> <result 
+			column="parent_ids" property="parentIds" /> <result column="name" property="name" 
+			/> <result column="sort" property="sort" /> <result column="type" property="type" 
+			/> <result column="create_by" property="createBy" /> <result column="create_date" 
+			property="createDate" /> <result column="update_by" property="updateBy" /> 
+			<result column="update_date" property="updateDate" /> <result column="remarks" 
+			property="remarks" /> <result column="del_flag" property="delFlag" /> </collection> -->
+	</resultMap>
+	<!-- sql片段 -->
+	<sql id="officeColumns">
+		a.id,
+		a.parent_id AS "parentId",
+		a.parent_ids AS "parentIds",
+		a.area_id AS
+		"area.id",
+		a.code,
+		a.name,
+		a.sort,
+		a.type,
+		a.grade,
+		a.address,
+		a.zip_code,
+		a.master,
+		a.phone,
+		a.fax,
+		a.email,
+		a.remarks,
+		a.create_by AS "createBys.id",
+		a.create_date,
+		a.update_by AS
+		"updateBy.id",
+		a.update_date,
+		a.del_flag,
+		a.useable AS useable,
+		a.primary_person AS "primaryPerson.id",
+		a.deputy_person AS
+		"deputyPerson.id",
+		p.name AS "parent.name",
+		ar.name AS
+		"area.name",
+		ar.parent_ids AS "area.parentIds",
+		pp.name AS
+		"primaryPerson.name",
+		dp.name AS "deputyPerson.name"
+	</sql>
+	<sql id="officeJoins">
+		LEFT JOIN sys_office p ON p.id = a.parent_id
+		LEFT JOIN
+		sys_area ar ON ar.id = a.area_id
+		LEFT JOIN sys_user pp ON pp.id =
+		a.primary_person
+		LEFT JOIN sys_user dp ON dp.id = a.deputy_person
+	</sql>
+	<!-- 通过办公编号获取办公机构信息 -->
+	<select id="getOfficeById" resultType="com.jmt.pojo.Office">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		<include refid="officeJoins" />
+		WHERE a.id = #{id}
+	</select>
+	<!-- 获取所有的办公机构信息集合 -->
+	<select id="findAllOffice" resultType="com.jmt.pojo.Office">
+		<!-- SELECT <include refid="officeColumns"/> FROM sys_office a <include 
+			refid="officeJoins"/> WHERE a.del_flag ='0' ORDER BY a.code -->
+		select
+		a.id,
+		a.parent_id AS "parentId",
+		a.parent_ids AS "parentIds",
+		a.area_id AS "area.id",
+		a.code,
+		a.name,
+		a.sort,
+		a.type,
+		a.grade,
+		a.address,
+		a.zip_code,
+		a.master,
+		a.phone,
+		a.fax,
+		a.email,
+		a.remarks,
+		a.create_by AS "createBys",
+		a.create_date ,
+		a.update_by AS "updateBys",
+		a.update_date,
+		a.del_flag,
+		a.useable AS useable,
+		a.primary_person AS "primaryPerson",
+		a.deputy_person AS "deputyPerson",
+		p.name AS "parent.name", ar.name AS "area.name", ar.parent_ids AS 
+			"area.parentIds",
+		pp.name AS "primaryPerson.name", dp.name AS "deputyPerson.name"
+		FROM sys_office a
+		LEFT JOIN sys_office p ON p.id = a.parent_id
+		LEFT JOIN sys_area ar ON ar.id = a.area_id
+		LEFT JOIN sys_user pp ON pp.id = a.primary_person LEFT JOIN sys_user 
+			dp ON dp.id = a.deputy_person
+		WHERE a.del_flag ='0'
+		ORDER BY a.code
+	</select>
+	
+	<!-- 通过获得的办公机构信息获取子类办公集合 -->
+	<select id="findOfficeByUserId" parameterType="String"
+		resultType="com.jmt.pojo.Office">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		<include refid="officeJoins" />
+		WHERE a.del_flag ='0'
+		<!-- OR a.id = #{id} -->
+		ORDER BY a.code
+	</select>
+	<!-- 通过子类编号信息模糊查询获得办公机构信息 -->
+	<select id="findOfficeByParentIdsLike" resultType="com.jmt.pojo.Office">
+		SELECT
+		<include refid="officeColumns" />
+		FROM sys_office a
+		<include refid="officeJoins" />
+		WHERE a.del_flag ='0' AND a.parent_ids LIKE #{parentIds}
+		ORDER BY
+		a.code
+	</select>
+</mapper>

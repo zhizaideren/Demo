@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 别名 -->
+	<typeAliases>
+		<typeAlias alias="User" type="com.jmt.pojo.User" />
+		<typeAlias alias="Role" type="com.jmt.pojo.Role" />
+		<typeAlias alias="Menu" type="com.jmt.pojo.Menu" />
+		<typeAlias alias="Office" type="com.jmt.pojo.Office" />
+		<typeAlias alias="roleOfficeVo" type="com.jmt.pojo.RoleOfficeVo" />
+		<typeAlias alias="area" type="com.jmt.pojo.Area" />
+		<typeAlias alias="MenuUser" type="com.jmt.pojo.MenuUser" />
+		<typeAlias alias="officeArea" type="com.jmt.pojo.OfficeArea" />
+		<typeAlias alias="BaseEntity" type="com.jmt.pojo.BaseEntity" />
+		<typeAlias alias="DataEntity" type="com.jmt.pojo.DataEntity" />
+		<typeAlias alias="TreeEntity" type="com.jmt.pojo.TreeEntity" />
+		<typeAlias alias="UserRole" type="com.jmt.pojo.UserRole" />
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/jmt/mapping/loginDaoMapper.xml" />
+	<mapper resource="com/jmt/mapping/UserDaoMapper.xml" /> 
+	<mapper resource="com/jmt/mapping/RoleDaoMapper.xml" />
+	<mapper resource="com/jmt/mapping/MenuDaoMapper.xml" />
+	<mapper resource="com/jmt/mapping/OfficeDaoMapper.xml" />
+	<mapper resource="com/jmt/mapping/AreaDaoMapper.xml" />
+		<!-- <mapper resource="com/jmt/mapping/SysMenuMapper.xml" 
+			/> <mapper resource="com/jmt/mapping/SysOfficeMapper.xml" /> <mapper resource="com/jmt/mapping/SysRoleOfficeMapper.xml" 
+			/> <mapper resource="com/jmt/mapping/SysUserRoleMapper.xml" /> <mapper resource="com/jmt/mapping/SysRoleMenuMapper.xml" 
+			/> -->
+	</mappers>
+</configuration>

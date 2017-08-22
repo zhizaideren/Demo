@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.MenuDao"><!-- 对应着menuDao的接口 -->
+	<resultMap type="com.jmt.pojo.Menu" id="MenuUserResultMap">
+		<id column="id" property="id" />
+
+		<result column="parent_ids" property="parentIds" />
+		<result column="name" property="name" />
+		<result column="sort" property="sort" />
+		<result column="href" property="href" />
+		<result column="target" property="target" />
+		<result column="icon" property="icon" />
+		<result column="is_show" property="isShow" />
+		<result column="permission" property="permission" />
+		<result column="create_by" property="createBy" />
+		<result column="create_date" property="createDate" />
+		<result column="update_by" property="updateBy" />
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<!-- 自身关联查询中：查询父级菜单模块 column:数据库里的查询字段 select:用于调用下面的select查询方法 -->
+		<association property="parent" column="parent_id" select="getParent"></association>
+		<!-- 自身关联查询中： 查询子模块 -->
+		<collection property="children" column="id" select="getChildren"></collection>
+	</resultMap>
+	<!-- sql片段 -->
+	<sql id="menuColumns">
+		a.id,
+		a.parent_id <!-- AS "parent.id" -->,
+		a.parent_ids,
+		a.name,
+		a.href,
+		a.target,
+		a.icon,
+		a.sort,
+		a.is_show,
+		a.permission,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS
+		"updateBy.id",
+		a.update_date,
+		a.del_flag,
+		p.name AS "parent.name"
+	</sql>
+
+	<!-- 查询父模块的方法 -->
+	<select id="getParent" parameterType="String" resultMap="MenuUserResultMap">
+		select *
+		from sys_menu where id=#{id}
+	</select>
+	<!-- 查询子类模块的方法 -->
+	<select id="getChildren" parameterType="String" resultMap="MenuUserResultMap">
+		select *
+		from sys_menu where parent_id=#{id} order by sort
+	</select>
+	<!-- 查询所有的菜单信息(系统管理员admin的菜单信息) -->
+	<select id="findAllList" resultMap="MenuUserResultMap">
+		select * from sys_menu a left
+		join sys_menu p on a.parent_id=p.id
+		order by a.sort
+	</select>
+
+	<!-- 根据用户编号查询菜单信息 -->
+	<select id="findMenuByUserId" parameterType="String" resultMap="MenuUserResultMap">
+	<!-- 	select * from sys_menu a
+		left join sys_menu b on a.parent_id=b.id
+		join
+		sys_role_menu rm on rm.menu_id=a.id
+		join sys_role r on r.id=rm.role_id
+		join sys_user_role ur on ur.role_id=r.id
+		join sys_user u on
+		ur.user_id=u.id
+		and u.id=#{id} -->
+		SELECT DISTINCT
+			<include refid="menuColumns"/>
+		FROM sys_menu a
+		LEFT JOIN sys_menu p ON p.id = a.parent_id
+		JOIN sys_role_menu rm ON rm.menu_id = a.id
+		JOIN sys_role r ON r.id = rm.role_id AND r.useable='1'
+		JOIN sys_user_role ur ON ur.role_id = r.id
+		JOIN sys_user u ON u.id = ur.user_id AND u.id = #{id}
+		<!-- WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND r.del_flag = #{DEL_FLAG_NORMAL} AND u.del_flag = #{DEL_FLAG_NORMAL}  -->
+		ORDER BY a.sort
+	</select>
+	<!-- 查询所有的父级菜单信息，admin的 -->
+	<select id="findMenuAll" resultMap="MenuUserResultMap">
+
+		select * from sys_menu a left
+		join sys_menu p on a.parent_id=p.id
+		order by
+		a.sort
+	</select>
+	<!-- 根据用户的编号和父类编号，查询出子类菜单的信息 -->
+	<select id="findallChildrenByUserId" parameterType="Map"
+		resultType="com.jmt.pojo.Menu">
+		select *
+		from sys_menu sm
+		where id in (select rm.menu_id
+		from
+		sys_role_menu rm
+		where rm.role_id in (select ur.role_id
+		from
+		Sys_User_Role ur
+		where ur.user_id = #{userId})
+		and rm.menu_id=sm.id)
+		and
+		parent_id =#{id}
+		order by sort desc
+	</select>
+</mapper>

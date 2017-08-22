@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.DictDao"><!-- 基础字典的mapper -->
+	<!-- 查询基础字典的所有信息集合 -->
+	<select id="findAllList" resultType="com.jmt.pojo.Dict">
+		select *
+		from Sys_Dict d
+		where d.del_flag ='0'
+		order by type, sort, update_date DESC
+
+
+	</select>
+</mapper>

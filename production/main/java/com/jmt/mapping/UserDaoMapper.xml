@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.UserDao"><!-- 对应着userDao的接口 -->
+	<resultMap type="com.jmt.pojo.Office" id="officeResultMap">
+	<id  column="id" property="id"/>
+	<result column="parent_id" property="parent"/>
+	<result column="parent_ids" property="parentIds"/>
+	<result column="name" property="name"/>
+	<result column="sort" property="sort"/>
+	<result column="area_id" property="area"/>
+	<result column="code" property="code"/>
+	<result column="type" property="type"/>
+	<result column="grade" property="grade"/>
+	<result column="address" property="address"/>
+	<result column="zip_code" property="zipCode"/>
+	<result column="master" property="master"/>
+	<result column="phone" property="phone"/>
+	<result column="fax" property="fax"/>
+	<result column="email" property="email"/>
+	<result column="useable" property="useable"/>
+	<result column="primary_person" property="primaryPerson"/>
+	<result column="deputy_person" property="deputyPerson"/>
+	<result column="create_by" property="createBy"/>
+	<result column="create_date" property="createDate"/>
+	<result column="update_by" property="updateBy"/>
+	<result column="update_date" property="updateDate"/>
+	<result column="remarks" property="remarks"/>
+	<result column="del_flag" property="delFlag"/>
+	</resultMap>
+	
+	
+<!-- ================================== -->
+<!-- 插入用户 -->
+	<insert id="insert">
+		INSERT INTO sys_user(
+			id, 
+			company_id, 
+			office_id, 
+			login_name, 
+			password, 
+			no, 
+			name, 
+			email, 
+			phone, 
+			mobile, 
+			user_type, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			login_flag, 
+			photo, 
+			qrcode,
+			del_flag
+		) VALUES (
+			#{id}, 
+			#{company.id}, 
+			#{office.id}, 
+			#{loginName}, 
+			#{password}, 
+			#{no}, 
+			#{name}, 
+			#{email}, 
+			#{phone}, 
+			#{mobile}, 
+			#{userType}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{loginFlag}, 
+			#{photo}, 
+			#{qrCode},
+			#{delFlag}
+		)
+	</insert>
+	
+	
+	<!-- 更新用户 -->
+	<update id="update">
+		UPDATE sys_user SET 
+			company_id = #{company.id}, 
+			office_id = #{office.id}, 
+			login_name = #{loginName}, 
+			password = #{password}, 
+			no = #{no}, 
+			name = #{name}, 
+			email = #{email}, 
+			phone = #{phone}, 
+			mobile = #{mobile}, 
+			user_type = #{userType}, 
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks},
+			login_flag = #{loginFlag},
+			photo = #{photo},
+			qrcode = #{qrCode}
+		WHERE id = #{id}
+	</update>
+	<!-- ====================================== -->
+
+	
+	
+	
+	
+	
+	<!-- 根据用户编号查询用户信息 -->
+	<select id="findUserInfo" parameterType="String" resultType="com.jmt.pojo.User">
+		select * from SYS_USER where id=#{id}
+	</select>
+	<!-- 修改用户信息 -->
+	<update id="updateUserInfo" parameterType="com.jmt.pojo.User">
+		update sys_user set
+		name=#{name},email=#{email},phone=#{phone},mobile=#{mobile} where
+		id=#{id}
+	</update>
+	<!-- 根据用户编号查询用户的角色 -->
+	<select id="findRoleByUserId" parameterType="String" resultType="com.jmt.pojo.Role">
+		select r.*
+		from sys_user u, sys_role r, sys_user_role ur
+		where u.id = ur.user_id
+		and ur.role_id = r.id
+		and u.id=#{id}
+	</select>
+	<!-- 查询所有的部门信息 -->
+	<select id="findAllOffice" resultMap="officeResultMap">
+		select t.*, t.rowid from SYS_OFFICE t
+	</select>
+	<!-- 查询所有带地区的部门信息 -->
+	<select id="findAllOfficeArea" resultType="com.jmt.pojo.OfficeArea">
+		select o.*,a.name from sys_office o,sys_area a where o.area_id=a.id
+	</select>
+</mapper>

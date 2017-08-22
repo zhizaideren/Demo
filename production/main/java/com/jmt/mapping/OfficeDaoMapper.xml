@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.OfficeDao"><!-- 对应着Daoceng的接口 -->
+	<resultMap type="com.jmt.pojo.OfficeArea" id="OfficeAreaResultMap">
+		<id column="id" property="id" />
+		<result column="parent_id" property="parentId" />
+		<result column="parent_ids" property="parentIds" />
+		<result column="name" property="name" />
+		<result column="sort" property="sort" />
+		<result column="type" property="type" />
+		<result column="grade" property="grade" />
+		<result column="address" property="address" />
+		<result column="zipCode" property="zipCode" />
+		<result column="master" property="master" />
+
+		<result column="phone" property="phone" />
+		<result column="fax" property="fax" />
+		<result column="email" property="email" />
+		<result column="useable" property="useable" />
+		<result column="primary_person" property="primaryPerson" />
+		<result column="deputy_person" property="deputyPerson" />
+		<result column="create_by" property="createBy" />
+		<result column="create_date" property="createDate" />
+		<result column="update_by" property="updateBy" />
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<!-- 单个area实体 -->
+		<!-- <association property="area" resultMap="com.jmt.dao.AreaDao.AreaResultMap"></association> -->
+		<!-- area集合 -->
+		<!-- <collection property="arealist" ofType="com.jmt.pojo.Area">
+			<id column="id" property="id" />
+			<result column="parent_id" property="parentId" />
+			<result column="parent_ids" property="parentIds" />
+			<result column="name" property="name" />
+			<result column="sort" property="sort" />
+			<result column="type" property="type" />
+			<result column="create_by" property="createBy" />
+			<result column="create_date" property="createDate" />
+			<result column="update_by" property="updateBy" />
+			<result column="update_date" property="updateDate" />
+			<result column="remarks" property="remarks" />
+			<result column="del_flag" property="delFlag" />
+
+		</collection> -->
+	</resultMap>
+	<!-- 通过办公编号获取办公机构信息 -->
+	<select id="">
+	
+	</select>
+</mapper>

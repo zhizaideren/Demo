@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.RoleDao"><!-- space里面写的是对应的dao层的接口 -->
+	<!-- 当持久化类的属性与数据库字段不一致时，在SQL语句中使用别名很麻烦，所以使用resultMap实现持久化类属性和字段的映射 -->
+
+	<resultMap type="com.jmt.pojo.Role" id="RoleResultMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="enname" property="enname" />
+		<result column="office_id" property="officeId" />
+		<result column="role_type" property="roleType" />
+		<result column="data_scope" property="dataScope" />
+		<result column="is_sys" property="sysData" />
+		<result column="useable" property="useable" />
+		<!-- <result column="create_by" property="createBy"/> -->
+		<result column="create_date" property="createDate" />
+		<!-- <result column="update_by" property="updateBy"/> -->
+		<result column="update_date" property="updateDate" />
+		<result column="remarks" property="remarks" />
+		<result column="del_flag" property="delFlag" />
+		<!-- office单个实体 -->
+		<association property="office"  column="office_id" resultMap="com.jmt.dao.OfficeDao.OfficeAreaResultMap">
+			
+		</association>
+		<!-- 菜单集合 -->
+		<collection property="menuList" ofType="com.jmt.pojo.Menu">
+			<id property="id" column="menuList.id" />
+		</collection>
+		<!-- 办公机构集合 -->
+		<collection property="officeList" ofType="com.jmt.pojo.Office">
+			<id property="id" column="officeList.id" />
+		</collection>
+	</resultMap>
+	
+	<!-- sql片段 -->
+	<sql id="roleColumns">
+		a.id,
+		a.office_id AS "officeId"
+		,
+		a.name,
+		a.enname,
+		a.role_type
+		,
+		a.data_scope AS "dataScope"
+		,
+		a.remarks,
+		a.create_by AS
+		"createBy.id",
+		a.create_date,
+		a.update_by AS
+		"updateBy.id",
+		a.update_date,
+		a.del_flag,
+		o.id AS "office.id",
+		o.name AS "office.name"
+		,
+		o.code,
+		a.useable <!-- AS useable -->
+		,
+		a.is_sys AS "sysData"
+	</sql>
+	<!-- 为RoleDao的getRole()方法定义对应的SQL映射语句 -->
+	<select id="getRole" parameterType="String" resultMap="RoleResultMap">
+		<!-- select * from sys_role where sys_role.id=#{id} -->
+		SELECT
+		<include refid="roleColumns" />
+		,
+		rm.menu_id AS "menuList.id",
+		ro.office_id AS "officeList.id"
+		FROM
+		sys_role a
+		LEFT JOIN sys_office o ON o.id =
+		a.office_id
+		LEFT JOIN
+		sys_role_menu rm ON rm.role_id = a.id
+		LEFT JOIN
+		sys_role_office ro ON
+		ro.role_id = a.id
+		WHERE a.id = #{id}
+	</select>
+
+
+	<!-- 为RoleDao的findRoleMenuByRoleId()方法定义对应的SQL映射语句 -->
+	<select id="findRoleMenuByRoleId" parameterType="String"
+		resultType="com.jmt.pojo.Role">
+		select 
+		<include refid="roleColumns" />
+		   from sys_role a
+      LEFT JOIN sys_office o ON o.id =
+		a.office_id
+    	LEFT JOIN
+		sys_role_office ro ON
+		ro.role_id = a.id
+		where a.id =
+		#{id}
+	</select>
+	<!-- 查询所有的角色信息findAllRole -->
+	<select id="findAllRole" resultType="com.jmt.pojo.Role">
+		select * from sys_role
+	</select>
+	<!-- 根据用户编号查询他所有的角色信息 -->
+	<select id="findRoleInfoByUserId" parameterType="String"
+		resultType="com.jmt.pojo.Role">
+		select 
+	<include refid="roleColumns" />
+		from sys_role a
+		where id in (select role_id
+		from
+		sys_user_role sur
+		where sur.user_id =#{id})
+
+	</select>
+
+	<!-- 根据角色编号查询角色信息，包括机构信息 -->
+	<select id="finRoleOfficeByUserId" parameterType="String"
+		resultMap="RoleResultMap">
+		<!-- select * from sys_role where sys_role.id=#{id} -->
+		SELECT
+		<include refid="roleColumns" />
+		,
+		rm.menu_id AS "menuList.id",
+		ro.office_id AS "officeList.id"
+		FROM
+		sys_role a
+		LEFT JOIN sys_office o ON o.id =
+		a.office_id
+		LEFT JOIN
+		sys_role_menu rm ON rm.role_id = a.id
+		LEFT JOIN
+		sys_role_office ro ON
+		ro.role_id = a.id
+		WHERE a.id = #{id}
+	</select>
+	<!-- 修改角色信息 -->
+	<update id="updateRoleInfo" parameterType="com.jmt.pojo.Role">
+
+		update sys_role set
+		office_id=#{officeId},name=#{name},enname=#{enname},role_type=#{roleType},is_sys=#{sysData},useable=#{useable},data_scope=#{dataScope},remarks=#{remarks}
+		where id=#{id}
+
+	</update>
+</mapper>

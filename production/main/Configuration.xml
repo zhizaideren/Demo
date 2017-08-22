@@ -1,0 +1,16 @@
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<!-- 这个配置文件在这里只作为扫描配置使用，可以看到其他配置都没有，因为我是在spring里面统一配置了 -->
+	<mappers>
+
+		<mapper resource="com/jmt/mapping/loginDaoMapper.xml" />
+		<mapper resource="com/jmt/mapping/UserDaoMapper.xml" />
+		<mapper resource="com/jmt/mapping/RoleDaoMapper.xml" />
+		<mapper resource="com/jmt/mapping/MenuDaoMapper.xml" />
+		<mapper resource="com/jmt/mapping/OfficeDaoMapper.xml" />
+		<mapper resource="com/jmt/mapping/AreaDaoMapper.xml" />
+
+	</mappers>
+
+
+</configuration>

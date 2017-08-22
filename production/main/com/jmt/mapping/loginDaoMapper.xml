@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jmt.dao.loginDao"><!-- space里面写的是对应的dao层的接口 -->
+	<!-- 当持久化类的属性与数据库字段不一致时，在SQL语句中使用别名很麻烦，所以使用resultMap实现持久化类属性和字段的映射 -->
+
+	<resultMap type="com.jmt.pojo.User" id="UserResultMap">
+		<id property="id" column="id" />
+		<result property="companyId" column="COMPANY_ID" />
+		<result property="officeId" column="OFFICE_ID" />
+		<result property="loginName" column="LOGIN_NAME" />
+		<result property="password" column="password" />
+		<result property="no" column="no" />
+		<result property="name" column="name" />
+		<result property="email" column="email" />
+
+		<result property="phone" column="phone" />
+		<result property="mobile" column="mobile" />
+		<result property="userType" column="USER_TYPE" />
+		<result property="photo" column="hiredate" />
+		<result property="loginIp" column="LOGIN_IP" />
+		<result property="loginDate" column="LOGIN_DATE" />
+		<result property="loginFlag" column="LOGIN_FLAG" />
+
+		<result property="createBy" column="CREATE_BY" />
+		<result property="createDate" column="CREATE_DATE" />
+		<result property="updateBy" column="UPDATE_BY" />
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="remarks" column="remarks" />
+		<result property="delFlag" column="DEL_FLAG" />
+		<result property="qrcode" column="qrcode" />
+	</resultMap>
+	<!-- <resultMap type="com.jmt.pojo.UserRole" id="UserRoleResultMap" extends="UserResultMap"> -->
+	<!-- 一个用户里对应着多个角色，所以要用到集合 -->
+	<!-- <collection property="role" ofType="com.jmt.pojo.Role"> <id column="id" 
+		property="id" /> <result column="name" property="name" /> <result column="ename" 
+		property="ename" /> <result column="role_type" property="roleType" /> <result 
+		column="data_scope" property="dataScope" /> <result column="is_sys" property="sysData" 
+		/> <result column="useable" property="useable" /> <result column="create_by" 
+		property="createBy"/> <result column="create_date" property="createDate" 
+		/> <result column="update_by" property="updateBy"/> <result column="update_date" 
+		property="updateDate" /> <result column="remarks" property="remarks" /> <result 
+		column="del_flag" property="delFlag" /> -->
+	<!-- 单位的映射 -->
+	<!-- <association property="office" javaType="com.jmt.pojo.Office"> <id 
+		column="id" property="id" /> <result column="parent_id" property="parent" 
+		/> <result column="parent_ids" property="parentIds" /> <result column="name" 
+		property="name" /> <result column="sort" property="sort" /> <result column="area_id" 
+		property="id" /> <result column="code" property="code" /> <result column="type" 
+		property="type" /> <result column="grade" property="grade" /> <result column="address" 
+		property="address" /> <result column="zip_code" property="zipCode" /> <result 
+		column="master" property="master" /> <result column="phone" property="phone" 
+		/> <result column="fax" property="fax" /> <result column="email" property="email" 
+		/> <result column="useable" property="useable" /> -->
+	<!-- <result column="primary_person" property="primaryPerson" /> <result 
+		column="deputy_person" property="deputyPerson" /> -->
+	<!-- <result property="createBy" column="CREATE_BY" /> -->
+	<!-- <result property="createDate" column="CREATE_DATE" /> -->
+	<!-- <result property="updateBy" column="UPDATE_BY" /> -->
+	<!-- <result property="updateDate" column="UPDATE_DATE" /> <result property="remarks" 
+		column="remarks" /> <result property="delFlag" column="DEL_FLAG" /> </association> 
+		</collection> </resultMap> -->
+	<!-- ================================== -->
+	<!-- sql片段 -->
+	<sql id="userColumns">
+		 a.id,
+		a.company_id AS "company.id",
+		a.office_id AS "office.id",
+		a.login_name AS "loginName",
+		a.password,
+		a.no,
+		a.name,
+		a.email,
+		a.phone,
+		a.mobile,
+		a.user_type,
+		a.login_ip,
+		a.login_date,
+		a.remarks,
+		a.login_flag,
+		a.photo,
+		a.qrcode,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,c.name AS "company.name",
+		c.parent_id AS
+		"company.parent.id",
+		c.parent_ids AS "company.parentIds",
+		ca.id AS
+		"company.area.id",
+		ca.name AS "company.area.name",
+		ca.parent_id AS
+		"company.area.parent.id",
+		ca.parent_ids AS "company.area.parentIds",
+		o.name AS "office.name",
+		o.parent_id AS "office.parent.id",
+		o.parent_ids AS "office.parentIds",
+		oa.id AS "office.area.id",
+		oa.name
+		AS "office.area.name",
+		oa.parent_id AS "office.area.parent.id",
+		oa.parent_ids AS "office.area.parentIds",
+		cu.id AS
+		"company.primaryPerson.id",
+		cu.name AS "company.primaryPerson.name",
+		cu2.id AS "company.deputyPerson.id",
+		cu2.name AS
+		"company.deputyPerson.name",
+		ou.id AS "office.primaryPerson.id",
+		ou.name AS "office.primaryPerson.name",
+		ou2.id AS
+		"office.deputyPerson.id",
+		ou2.name AS "office.deputyPerson.name"
+	</sql>
+	<sql id="userJoins">
+	
+	LEFT JOIN sys_office c
+		ON c.id = a.company_id
+		LEFT JOIN sys_area ca ON ca.id
+		= c.area_id
+		LEFT
+		JOIN sys_office o ON o.id = a.office_id
+		LEFT JOIN
+		sys_area oa ON oa.id
+		= o.area_id
+		LEFT JOIN sys_user cu ON cu.id =
+		c.primary_person
+		LEFT JOIN
+		sys_user cu2 ON cu2.id = c.deputy_person
+		LEFT
+		JOIN sys_user ou ON ou.id
+		= o.primary_person
+		LEFT JOIN sys_user ou2 ON
+		ou2.id = o.deputy_person
+	</sql>
+	<!-- 根据角色编号获取用户信息 -->
+	<select id="findUserByUser" resultType="com.jmt.pojo.User">
+	select 
+	<include refid="userColumns"/>
+		 from
+		sys_user a
+		<include refid="userJoins"/>
+		
+		<!--=======新添加角色连接查询 -->
+		<if test="role != null ">
+			<if test="role.id != null and role.id != ''">
+				JOIN sys_user_role ur ON ur.user_id = a.id AND ur.role_id = #{role.id}
+			</if>
+		</if>
+		<!-- ===================== -->
+		WHERE a.del_flag ='0'
+		
+			<if test="company != null and company.id != null and company.id != ''">
+				AND (c.id = #{company.id} OR c.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%,'||#{company.id}||',%')</if>
+				<if test="dbName == 'mysql'">CONCAT('%,', #{company.id}, ',%'))</if>
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND (o.id = #{office.id} OR o.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%,'||#{office.id}||',%')</if>
+				<if test="dbName == 'mysql'">CONCAT('%,', #{office.id}, ',%'))</if>
+			</if>
+			<!-- 如果不是超级管理员，则不显示超级管理员用户 -->
+			<!-- <if test="id!='1'">
+				AND a.id != '1'
+			</if> -->
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name like
+				<if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{loginName}, '%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name like
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{name}, '%')</if>
+			</if>
+	
+		ORDER BY c.code, o.code, a.name
+	</select>
+
+	<!-- ====================================== -->
+			<!-- 通过用户编号获取用户信息getUser -->
+			<select id="getUser" resultType="com.jmt.pojo.User">			
+			SELECT
+			<include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.id = #{userId}
+
+			</select>
+
+	<!-- 为loginDao的getUserByUserName()方法定义对应的SQL映射语句 -->
+	<select id="getUserByUserName" parameterType="String" resultMap="UserResultMap">
+		select * from SYS_USER where login_name=#{loginName}
+	</select>
+	<!-- 为loginDao的getRolesByUserName()方法定义对应的SQL映射语句 -->
+	<select id="getRolesByUserName" parameterType="String"
+		resultType="String">
+		select r.name
+		from sys_user u, sys_role r, sys_user_role ur
+		where u.id = ur.user_id
+		and ur.role_id = r.id
+		and
+		u.login_name=#{loginName}
+	</select>
+	<!-- 为loginDao的getPermissionsByUserName（）方法定义对应的sql映射语句 -->
+	<select id="getPermissionsByUserName" parameterType="String"
+		resultType="String">
+		<!-- select distinct m.permission from sys_user u, sys_user_role ur, sys_role 
+			r, sys_role_menu rm, sys_menu m where u.id = ur.user_id and ur.role_id = 
+			r.id and r.id = rm.role_id and rm.menu_id = m.id and u.login_name =#{loginName} -->
+		select distinct nvl(permission,0)
+		from sys_menu
+		where id in
+		(select
+		distinct menu_id
+		from sys_role_menu
+		where role_id in
+		(select role_id
+		from
+		sys_user_role
+		where user_id in
+		(select id
+		from sys_user u
+		where login_name
+		= #{loginName})))
+	</select>
+
+</mapper>
